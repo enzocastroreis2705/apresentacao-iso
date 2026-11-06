@@ -337,23 +337,25 @@
     e.deltaY > 0 ? next() : prev();
   }, { passive: true });
 
-  let tx = 0, ty = 0;
-  addEventListener('touchstart', (e) => { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
-  addEventListener('touchend', (e) => {
-    const dx = e.changedTouches[0].clientX - tx;
-    const dy = e.changedTouches[0].clientY - ty;
-    if (started && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) dx < 0 ? next() : prev();
+  let tx = 0, ty = 0, tt = 0;
+  addEventListener('touchstart', (e) => {
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY; tt = performance.now();
   }, { passive: true });
+  addEventListener('touchend', (e) => {
+    if (e.touches.length) return;
+    const { clientX: x, clientY: y } = e.changedTouches[0];
+    const dx = x - tx, dy = y - ty;
+    if (started && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) return dx < 0 ? next() : prev();
 
-  /* ---------- Celular: toque passa de slide (terço esquerdo volta) ---------- */
-  const isTouch = matchMedia('(hover: none) and (pointer: coarse)');
-  addEventListener('click', (e) => {
-    if (!isTouch.matches) return;
-    if (!started) { startIntro(); return; }
-    if (locked || e.target.closest('button, a, .tile-flip, .row, .tl-dot, .ticket')) return;
-    if (e.clientX < innerWidth / 3) prev();
+    // Toque rápido (sem arrastar) passa de slide; no terço esquerdo, volta
+    if (Math.hypot(dx, dy) > 12 || performance.now() - tt > 500) return;
+    if (e.target.closest('button, a, .tile-flip, .row, .tl-dot, .ticket')) return;
+    e.preventDefault(); // evita o clique fantasma no slide seguinte
+    if (!started) startIntro();
+    else if (locked) return;
+    else if (x < innerWidth / 3) prev();
     else if (!stepInteractive()) next();
-  });
+  }, { passive: false });
 
   /* ---------- Fundo: malha de pontos reativa ---------- */
   const cv = $('bg');
