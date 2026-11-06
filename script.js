@@ -287,6 +287,26 @@
     }
   }
 
+  // Slides 12 e 16: o avanço primeiro anda a linha do tempo / imprime a comanda;
+  // depois de concluídos, volta a passar de slide. Retorna true se consumiu o avanço.
+  function stepInteractive() {
+    if (slides[current] === timelineSlide) {
+      const sealed = timelineSlide.classList.contains('sealed');
+      if (!sealed || performance.now() - sealedAt < 1600) {
+        if (!sealed) timelineSlide.querySelector('.tl-step.next .tl-dot')?.click();
+        return true;
+      }
+    }
+    if (slides[current] === ticketSlide) {
+      const done = ticketSlide.classList.contains('done');
+      if (!done || performance.now() - ticketDoneAt < 2200) {
+        if (!done) $('ticket').click();
+        return true;
+      }
+    }
+    return false;
+  }
+
   const START_KEYS = [' ', 'ArrowRight', 'ArrowDown', 'PageDown', 'Enter'];
 
   addEventListener('keydown', (e) => {
@@ -297,24 +317,7 @@
     }
     // Ignora a repetição de tecla segurada, para não disparar vários slides
     if (e.repeat && e.key !== 'f' && e.key !== 'F') { e.preventDefault(); return; }
-    // Slide 12: o espaço avança a linha do tempo até o selo; depois, volta a passar de slide
-    if (e.key === ' ' && slides[current] === timelineSlide) {
-      const sealed = timelineSlide.classList.contains('sealed');
-      if (!sealed || performance.now() - sealedAt < 1600) {
-        e.preventDefault();
-        if (!sealed) timelineSlide.querySelector('.tl-step.next .tl-dot')?.click();
-        return;
-      }
-    }
-    // Slide 16: o espaço imprime a próxima linha da comanda; depois do total, volta a passar de slide
-    if (e.key === ' ' && slides[current] === ticketSlide) {
-      const done = ticketSlide.classList.contains('done');
-      if (!done || performance.now() - ticketDoneAt < 2200) {
-        e.preventDefault();
-        if (!done) $('ticket').click();
-        return;
-      }
-    }
+    if (e.key === ' ' && stepInteractive()) { e.preventDefault(); return; }
     switch (e.key) {
       case 'ArrowRight': case 'ArrowDown': case 'PageDown': case ' ': case 'Enter':
         e.preventDefault(); next(); break;
@@ -341,6 +344,16 @@
     const dy = e.changedTouches[0].clientY - ty;
     if (started && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) dx < 0 ? next() : prev();
   }, { passive: true });
+
+  /* ---------- Celular: toque passa de slide (terço esquerdo volta) ---------- */
+  const isTouch = matchMedia('(hover: none) and (pointer: coarse)');
+  addEventListener('click', (e) => {
+    if (!isTouch.matches) return;
+    if (!started) { startIntro(); return; }
+    if (locked || e.target.closest('button, a, .tile-flip, .row, .tl-dot, .ticket')) return;
+    if (e.clientX < innerWidth / 3) prev();
+    else if (!stepInteractive()) next();
+  });
 
   /* ---------- Fundo: malha de pontos reativa ---------- */
   const cv = $('bg');
