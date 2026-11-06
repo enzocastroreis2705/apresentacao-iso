@@ -1,818 +1,510 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Armageddon Paradoxx</title>
-  <style>
-    :root{
-      --bg: #0b0f14;
-      --panel: #101826;
-      --panel2: #0f1724;
-      --border: #1d2a3a;
-      --text: #e8eef6;
-      --muted: #a7b7cc;
-      --link: #87b6ff;
-      --btn: #2b78ff;
-      --btn2: transparent;
-      --chip: #cfe2ff;
-      --danger: #ff4d4d;
-    }
-
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: system-ui, Arial, sans-serif; background: var(--bg); color: var(--text); }
-
-    a { color: var(--link); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    .app {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar{
-      border-right: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--panel2), var(--bg));
-      padding: 18px 14px;
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow: auto;
-    }
-    .brand{
-      padding: 10px 10px 16px;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 14px;
-    }
-    .brand h1{
-      font-size: 18px;
-      margin: 0 0 6px;
-      letter-spacing: .2px;
-    }
-    .brand .muted{ font-size: 13px; color: var(--muted); }
-
-    .navgroup{
-      margin: 14px 0;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: rgba(16,24,38,.65);
-    }
-    .navgroup h2{
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .12em;
-      color: var(--muted);
-      margin: 0 0 8px;
-    }
-    .navitem{
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 8px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .navitem:hover{ background: rgba(135,182,255,.08); }
-    .navitem.active{ background: rgba(43,120,255,.18); border: 1px solid rgba(43,120,255,.35); }
-    .badge{
-      font-size: 12px;
-      color: var(--chip);
-      border: 1px solid var(--border);
-      padding: 2px 8px;
-      border-radius: 999px;
-      align-self: center;
-      white-space: nowrap;
-    }
-
-    /* Main */
-    .main{
-      padding: 22px;
-    }
-    .topbar{
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: rgba(16,24,38,.75);
-      position: sticky;
-      top: 12px;
-      z-index: 10;
-      backdrop-filter: blur(6px);
-    }
-    .search{
-      flex: 1;
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      min-width: 220px;
-    }
-    .search input{
-      width: 100%;
-      background: rgba(11,15,20,.8);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 12px;
-      color: var(--text);
-      outline: none;
-    }
-    .search input:focus{
-      border-color: rgba(135,182,255,.6);
-      box-shadow: 0 0 0 3px rgba(135,182,255,.12);
-    }
-
-    .actions{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-    }
-    button{
-      font: inherit;
-      border-radius: 12px;
-      padding: 10px 12px;
-      cursor: pointer;
-      border: 1px solid var(--border);
-    }
-    .primary{
-      background: var(--btn);
-      border-color: rgba(43,120,255,.5);
-      color: white;
-    }
-    .ghost{
-      background: var(--btn2);
-      color: var(--text);
-    }
-    button:disabled{ opacity: .6; cursor: not-allowed; }
-
-    .grid{
-      margin-top: 16px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 980px){
-      .app{ grid-template-columns: 1fr; }
-      .sidebar{ position: relative; height: auto; }
-      .grid{ grid-template-columns: 1fr; }
-      .topbar{ position: relative; top: 0; }
-    }
-
-    .card{
-      background: rgba(16,24,38,.75);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 16px;
-    }
-    .card h3{ margin: 0 0 8px; font-size: 16px; }
-    .muted{ color: var(--muted); font-size: 14px; }
-    .status{ min-height: 20px; margin-top: 10px; white-space: pre-wrap; }
-
-    .list{
-      margin-top: 10px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .row{
-      display: flex;
-      gap: 12px;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(11,15,20,.35);
-    }
-    .row:last-child{ border-bottom: 0; }
-    .row:hover{ background: rgba(135,182,255,.06); }
-    .row .title{
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-    .row .title a{
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 520px;
-    }
-    .row .meta{ font-size: 12px; color: var(--muted); }
-
-    .chips{ display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-    .chip{
-      font-size: 12px;
-      padding: 4px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      color: var(--chip);
-      background: rgba(16,24,38,.4);
-      white-space: nowrap;
-      user-select: none;
-    }
-    .chip.clickable{ cursor: pointer; }
-    .chip.danger{
-      border-color: rgba(255,77,77,.55);
-      color: #ffd1d1;
-      background: rgba(255,77,77,.08);
-    }
-    .chip.danger:hover{
-      background: rgba(255,77,77,.14);
-    }
-
-    iframe{
-      width: 100%;
-      height: 70vh;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: var(--bg);
-    }
-
-    .uploadline{
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: 10px;
-    }
-    input[type="file"]{
-      width: 100%;
-      background: rgba(11,15,20,.35);
-      border: 1px dashed rgba(29,42,58,.9);
-      border-radius: 12px;
-      padding: 10px 12px;
-      color: var(--muted);
-    }
-    .hint{
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 8px;
-      line-height: 1.35;
-    }
-    .adminHint{
-      margin-top: 10px;
-      padding: 10px 12px;
-      border: 1px dashed rgba(135,182,255,.35);
-      border-radius: 12px;
-      background: rgba(16,24,38,.35);
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-  
-
-    /* ===== Mobile layout (drawer + top-right actions) ===== */
-    .backdrop{
-      display:none;
-      position:fixed;
-      inset:0;
-      background: rgba(0,0,0,.45);
-      z-index:40;
-    }
-    body.sidebar-open .backdrop{ display:block; }
-
-    .menuBtn{
-      display:none;
-      background: rgba(16,24,38,.75);
-      border: 1px solid var(--border);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 10px 12px;
-      cursor: pointer;
-    }
-
-    @media (max-width: 980px){
-      .app{ grid-template-columns: 1fr; }
-      .main{ padding: 14px; }
-
-      /* Sidebar vira drawer */
-      .sidebar{
-        position: fixed !important;
-        z-index: 50;
-        left: 0; top: 0;
-        height: 100vh !important;
-        width: min(86vw, 340px);
-        transform: translateX(-105%);
-        transition: transform .22s ease;
-        box-shadow: 0 10px 30px rgba(0,0,0,.45);
-        overflow: auto;
-      }
-      body.sidebar-open .sidebar{ transform: translateX(0); }
-
-      /* Topbar: menu à esquerda, busca no meio, botões no canto direito */
-      .menuBtn{ display:inline-flex; align-items:center; justify-content:center; }
-      .topbar{
-        position: sticky;
-        top: 10px;
-        padding: 12px;
-        gap: 10px;
-        flex-direction: row !important;
-        align-items: center;
-      }
-      .search{ flex: 1; min-width: 0; }
-      .search input{ width: 100%; }
-      .actions{
-        margin-left: auto;
-        width: auto;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-      button{ padding: 12px 12px; }
-
-      /* Grid vira 1 coluna */
-      .grid{ grid-template-columns: 1fr; }
-
-      /* Lista: melhora toque */
-      .row{
-        align-items: flex-start;
-        gap: 10px;
-      }
-      .row .title a{ max-width: 100%; }
-      .chips{ justify-content: flex-start; }
-      .chip{ padding: 8px 12px; font-size: 13px; }
-
-      iframe{ height: 64vh; }
-      input[type="file"]{ padding: 12px; }
-    }
-
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ISO 9001 — Qualidade em Movimento</title>
+  <link rel="stylesheet" href="fonts.css?v=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 10 10%22%3E%3Ccircle cx=%225%22 cy=%225%22 r=%225%22 fill=%22%233ba7ff%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=14">
 </head>
 <body>
-  <div class="backdrop" id="backdrop"></div>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <h1>Armageddon Paradoxx</h1>
-        <div class="muted">Sua “enciclopédia” de arquivos, só que sem bibliotecário.</div>
-      </div>
 
-      <div class="navgroup">
-        <h2>Categorias</h2>
-        <div id="cats"></div>
-      </div>
+  <!-- Filtro de contorno: desenha só a borda externa das letras (sem as emendas internas da fonte) -->
+  <svg class="svg-defs" aria-hidden="true" focusable="false">
+    <filter id="outline" x="-5%" y="-5%" width="110%" height="110%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="1" result="grown"/>
+      <feComposite in="grown" in2="SourceAlpha" operator="out" result="edge"/>
+      <feFlood flood-color="#eef3ff" flood-opacity=".1"/>
+      <feComposite in2="edge" operator="in"/>
+    </filter>
+  </svg>
 
-      <div class="navgroup">
-        <h2>Atalhos</h2>
-        <div class="navitem" id="allBtn">
-          <span>Todos os documentos</span>
-          <span class="badge" id="totalCount">0</span>
-        </div>
-        <div class="muted" style="padding: 8px;">
-          Dica: “categorias” aqui são pastas no Storage (ex.: <code>historia/</code>, <code>trabalhos/</code>).
-        </div>
-      </div>
-    </aside>
+  <!-- Camadas de fundo -->
+  <div class="orbs" aria-hidden="true">
+    <span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span>
+  </div>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-    <main class="main">
-      <div class="topbar">
-        <button id="menuBtn" class="menuBtn" aria-label="Abrir menu">☰</button>
-        <div class="search">
-          <input id="q" placeholder="Buscar documento..." />
-        </div>
-        <div class="actions">
-          <button id="adminBtn" class="ghost">Login Admin</button>
-          <button id="refreshBtn" class="ghost">Atualizar</button>
-        </div>
-      </div>
-
-      <div class="grid">
-        <section class="card" id="uploadSection">
-          <div class="muted">Envie um .docx. Se quiser “categoria”, coloque no campo pasta.</div>
-
-          <input id="folder" placeholder="Pasta/categoria (ex: trabalhos, historia, rpg)" style="margin-top:10px; background: rgba(11,15,20,.8); border:1px solid var(--border); border-radius:12px; padding:10px 12px; color:var(--text); outline:none;" />
-          <input id="file" type="file" accept=".docx" />
-
-          <div class="uploadline">
-            <button id="uploadBtn" class="primary">Upload</button>
-          </div>
-
-          <div id="status" class="status muted"></div>
-
-          <div class="adminHint">
-            Admin: faça login para conseguir interagir com o site.
-          </div>
-
-          <div class="hint">
-            Arquivos ficam públicos se o bucket estiver público. Para apagar com segurança, use policy de DELETE só para <code>authenticated</code>.
-          </div>
-        </section>
-
-        <section class="card">
-          <h3>Leitor</h3>
-          <div class="muted" id="readingMeta">Selecione um documento na lista.</div>
-          <div id="viewerWrap" style="margin-top: 12px;">
-            <div class="muted">Nada aberto.</div>
-          </div>
-        </section>
-      </div>
-
-      <section class="card" style="margin-top:16px;">
-        <h3 id="listTitle">Documentos</h3>
-        <div class="muted" id="listSubtitle">Mostrando tudo.</div>
-
-        <div class="list" id="list"></div>
-        <div class="muted" id="empty" style="display:none; padding: 10px 2px;">Nenhum documento encontrado.</div>
-      </section>
-    </main>
+  <!-- Intro -->
+  <div class="intro" id="intro">
+    <div class="intro-inner">
+      <span class="mono">Gestão da Qualidade</span>
+      <span class="intro-count"><span id="introCount">0</span>%</span>
+    </div>
+    <div class="intro-bar"><span id="introBar"></span></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // Configure aqui
-    const SUPABASE_URL = "https://tqdqqbqmcmctozgzlpxs.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_eYs2DCkzhe0JlKhfRJra-Q_96_tH2i9";
-    const BUCKET = "docs";
+  <!-- HUD -->
+  <header class="hud hud-top">
+    <div class="brand"><span class="brand-mark"></span>ISO 9001</div>
+    <div class="hud-title" id="hudTitle">Abertura</div>
+  </header>
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <main class="deck" id="deck">
 
-    const qEl = document.getElementById("q");
-    const catsEl = document.getElementById("cats");
-    const totalCountEl = document.getElementById("totalCount");
-    const allBtn = document.getElementById("allBtn");
-    const uploadSection = document.getElementById("uploadSection");
+    <!-- 01 · Abertura -->
+    <section class="slide s-hero" data-title="Abertura">
+      <div class="hero-meta" data-anim style="--d:0">
+        <span>(01) Norma internacional</span>
+        <span>(02) Gestão da qualidade</span>
+        <span>(03) Melhoria contínua</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="line"><span class="sans-xl" data-split>ISO</span></span>
+        <span class="line line-2"><span class="serif-xl grad-text" data-split>9001</span></span>
+      </h1>
+      <div class="hero-foot">
+        <p class="hero-sub" data-anim style="--d:9">Qualidade não é um destino.<br><em>É um ciclo.</em></p>
+        <button class="badge" id="heroNext" type="button" aria-label="Começar" data-anim="scale" style="--d:11">
+          <svg viewBox="0 0 200 200" class="badge-ring">
+            <defs><path id="circ" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+            <text><textPath href="#circ" textLength="485">QUALIDADE · PROCESSOS · MELHORIA · CLIENTE · </textPath></text>
+          </svg>
+          <span class="badge-core">→</span>
+        </button>
+      </div>
+    </section>
 
-    const folderEl = document.getElementById("folder");
-    const fileInput = document.getElementById("file");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const refreshBtn = document.getElementById("refreshBtn");
-    const adminBtn = document.getElementById("adminBtn");
-    const statusEl = document.getElementById("status");
-
-    const listTitle = document.getElementById("listTitle");
-    const listSubtitle = document.getElementById("listSubtitle");
-    const listEl = document.getElementById("list");
-    const emptyEl = document.getElementById("empty");
-
-    const readingMeta = document.getElementById("readingMeta");
-    const viewerWrap = document.getElementById("viewerWrap");
-
-    let allFiles = []; // { name, updated_at, folder, publicUrl }
-    let activeFolder = ""; // "" = tudo
-    let currentUser = null;
-
-    function setStatus(msg){ statusEl.textContent = msg || ""; }
-
-    function safeName(name){
-      return name.replace(/[^\w.\- ]+/g, "_").trim();
-    }
-    function safeFolder(folder){
-      if (!folder) return "";
-      return folder
-        .trim()
-        .replace(/\\/g, "/")
-        .replace(/^\/+|\/+$/g, "")
-        .replace(/[^a-zA-Z0-9_\-\/ ]+/g, "_")
-        .replace(/\s+/g, "_");
-    }
-
-    function displayFolderName(name){
-      return (name || "")
-        .replace(/_/g, " ")
-        .trim();
-    }
-
-
-    function updateAuthUI(){
-      if (currentUser) {
-        adminBtn.textContent = "Sair (Admin)";
-        uploadSection.style.display = "block";
-      } else {
-        adminBtn.textContent = "Login Admin";
-        uploadSection.style.display = "none";
-      }
-    }
-
-    async function checkUser(){
-      const { data } = await supabaseClient.auth.getUser();
-      currentUser = data?.user || null;
-      updateAuthUI();
-    }
-
-    async function loginAdmin(){
-      const email = prompt("Email admin:");
-      const password = prompt("Senha:");
-      if (!email || !password) return;
-
-      const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert("Erro no login: " + error.message);
-        return;
-      }
-      await checkUser();
-      await refreshAll();
-    }
-
-    async function logoutAdmin(){
-      await supabaseClient.auth.signOut();
-      currentUser = null;
-      updateAuthUI();
-      await refreshAll();
-    }
-
-    async function uploadDocx(){
-      const file = fileInput.files?.[0];
-      if (!file) return setStatus("Escolhe um .docx primeiro.");
-      if (!file.name.toLowerCase().endsWith(".docx")) return setStatus("Só aceito .docx.");
-
-      uploadBtn.disabled = true;
-      setStatus("Enviando...");
-
-      const folder = safeFolder(folderEl.value);
-      const clean = safeName(file.name);
-      const stamp = new Date().toISOString().replace(/[:.]/g, "-");
-
-      const path = (folder ? folder + "/" : "") + `${stamp}__${clean}`;
-
-      const { error } = await supabaseClient.storage
-        .from(BUCKET)
-        .upload(path, file, {
-          upsert: false,
-          contentType: file.type || "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        });
-
-      uploadBtn.disabled = false;
-
-      if (error){
-        setStatus("Falhou no upload: " + error.message);
-        return;
-      }
-
-      setStatus("Upload feito: " + clean);
-      fileInput.value = "";
-      await refreshAll();
-    }
-
-    async function deleteFile(fullPath){
-      if (!currentUser) {
-        alert("Você precisa estar logado como admin pra apagar.");
-        return;
-      }
-      const ok = confirm("Apagar este arquivo?\n\n" + fullPath);
-      if (!ok) return;
-
-      const { error } = await supabaseClient.storage
-        .from(BUCKET)
-        .remove([fullPath]);
-
-      if (error){
-        alert("Erro ao apagar: " + error.message);
-        return;
-      }
-      await refreshAll();
-    }
-
-    async function listRecursive(prefix=""){
-      const { data, error } = await supabaseClient.storage.from(BUCKET).list(prefix, {
-        limit: 100,
-        sortBy: { column: "name", order: "asc" }
-      });
-      if (error) throw error;
-
-      const files = [];
-      for (const item of data){
-        if (!item.name) continue;
-        const full = prefix ? `${prefix}/${item.name}` : item.name;
-
-        const isDocx = full.toLowerCase().endsWith(".docx");
-        if (isDocx){
-          const { data: pub } = supabaseClient.storage.from(BUCKET).getPublicUrl(full);
-          files.push({
-            name: full,
-            updated_at: item.updated_at || item.created_at || null,
-            folder: prefix || "",
-            publicUrl: pub.publicUrl
-          });
-        } else {
-          try {
-            const sub = await listRecursive(full);
-            files.push(...sub);
-          } catch (e) {
-            // ignora
-          }
-        }
-      }
-      return files;
-    }
-
-    function buildCategories(files){
-      const counts = new Map();
-      for (const f of files){
-        const parts = f.name.split("/");
-        const cat = (parts.length > 1) ? parts[0] : "Sem categoria";
-        counts.set(cat, (counts.get(cat) || 0) + 1);
-      }
-      const cats = [...counts.entries()].sort((a,b)=>{
-        if (a[0] === "Sem categoria") return 1;
-        if (b[0] === "Sem categoria") return -1;
-        return a[0].localeCompare(b[0]);
-      });
-
-      catsEl.innerHTML = "";
-      for (const [cat, n] of cats){
-        const div = document.createElement("div");
-        div.className = "navitem" + (activeFolder === cat ? " active" : "");
-        div.onclick = () => {
-          activeFolder = (cat === "Sem categoria") ? "__root__" : cat;
-          render();
-          highlightCats();
-        };
-
-        const left = document.createElement("span");
-        left.textContent = displayFolderName(cat);
-
-        const badge = document.createElement("span");
-        badge.className = "badge";
-        badge.textContent = n;
-
-        div.appendChild(left);
-        div.appendChild(badge);
-        catsEl.appendChild(div);
-      }
-    }
-
-    function highlightCats(){
-      [...catsEl.children].forEach(el => el.classList.remove("active"));
-      [...catsEl.children].forEach(el => {
-        const label = el.querySelector("span")?.textContent;
-        const key = (label === "Sem categoria") ? "__root__" : label;
-        if (key === activeFolder) el.classList.add("active");
-      });
-
-      allBtn.classList.toggle("active", activeFolder === "");
-    }
-
-    function filterFiles(){
-      const term = qEl.value.trim().toLowerCase();
-      return allFiles.filter(f => {
-        const parts = f.name.split("/");
-        const cat = (parts.length > 1) ? parts[0] : "__root__";
-        const folderOk = !activeFolder || cat === activeFolder;
-        const textOk = !term || f.name.toLowerCase().includes(term);
-        return folderOk && textOk;
-      });
-    }
-
-    function prettyTitle(path){
-      const base = path.split("/").pop();
-      return base.replace(/^\d{4}-\d{2}-\d{2}T.*?__/, "");
-    }
-
-    function openInViewer(file){
-      const viewerUrl = "https://view.officeapps.live.com/op/embed.aspx?src=" + encodeURIComponent(file.publicUrl);
-      const raw = file.name.includes("/") ? file.name.split("/")[0] : "Sem categoria";
-      const nice = raw === "Sem categoria" ? raw : displayFolderName(raw);
-      readingMeta.textContent = `Lendo: ${prettyTitle(file.name)} • ${nice}`;
-
-      viewerWrap.innerHTML = `
-        <iframe src="${viewerUrl}" loading="lazy" referrerpolicy="no-referrer"></iframe>
-        <div class="muted" style="margin-top:10px;">
-          <a href="${file.publicUrl}" target="_blank" rel="noopener">Abrir link direto</a> (para baixar ou compartilhar).
+    <!-- 02 · Por que qualidade -->
+    <section class="slide s-statement" data-title="Por que qualidade?">
+      <p class="eyebrow" data-anim style="--d:0">01 — Por que qualidade?</p>
+      <h2 class="statement">
+        <span class="line"><span data-split>Processos melhores.</span></span>
+        <span class="line"><span class="serif grad-text" data-split>Clientes mais felizes.</span></span>
+      </h2>
+      <p class="lead" data-anim style="--d:14">Qualidade não é ser perfeito: é entregar <strong>sempre</strong> o que o cliente espera. A ISO 9001 organiza isso em <strong>qualquer organização</strong>, de qualquer porte ou setor.</p>
+      <div class="marquee" data-anim="fade" style="--d:16">
+        <div class="marquee-track">
+          <span>Indústria</span><span>Saúde</span><span>Educação</span><span>Comércio</span><span>Serviços</span><span>Órgãos públicos</span><span>Construção</span><span>Logística</span>
+          <span>Indústria</span><span>Saúde</span><span>Educação</span><span>Comércio</span><span>Serviços</span><span>Órgãos públicos</span><span>Construção</span><span>Logística</span>
         </div>
-      `;
-    }
+      </div>
+    </section>
 
-    function render(){
-      const filtered = filterFiles();
-      listEl.innerHTML = "";
-      emptyEl.style.display = filtered.length ? "none" : "block";
+    <!-- 03 · A organização -->
+    <section class="slide s-iso" data-title="A organização">
+      <div class="iso-word" aria-hidden="true"><span>ἴσος</span></div>
+      <p class="eyebrow" data-anim style="--d:0">02 — A organização</p>
+      <h2 class="title">
+        <span class="line"><span data-split>ISO vem do grego</span></span>
+        <span class="line"><span class="serif grad-text" data-split>isos: igual.</span></span>
+      </h2>
+      <p class="lead" data-anim style="--d:12">International Organization for Standardization. O nome é o mesmo em qualquer idioma — afinal, a ideia é justamente padronizar.</p>
+      <div class="facts">
+        <div class="fact" data-anim style="--d:15"><span class="fact-v">1947</span><span class="fact-l">Fundada em 23 de fevereiro, como organização não governamental</span></div>
+        <div class="fact" data-anim style="--d:16"><span class="fact-v">Genebra</span><span class="fact-l">Sede na Suíça. Reúne os órgãos de normalização de vários países</span></div>
+        <div class="fact" data-anim style="--d:17"><span class="fact-v">ABNT</span><span class="fact-l">Representa o Brasil. Aqui a norma se chama ABNT NBR ISO 9001</span></div>
+        <div class="fact" data-anim style="--d:18"><span class="fact-v">Não certifica</span><span class="fact-l">A ISO só cria as normas. Quem certifica são organismos independentes</span></div>
+      </div>
+    </section>
 
-      const folderLabel = activeFolder
-        ? (activeFolder === "__root__" ? "Sem categoria" : activeFolder)
-        : "Tudo";
+    <!-- 04 · Família ISO 9000 -->
+    <section class="slide s-compare" data-title="A família ISO 9000">
+      <p class="eyebrow" data-anim style="--d:0">03 — A família ISO 9000</p>
+      <h2 class="title">
+        <span class="line"><span data-split>Duas normas,</span></span>
+        <span class="line"><span class="serif grad-text" data-split>um só propósito.</span></span>
+      </h2>
+      <div class="compare">
+        <div class="card-wrap" data-anim="card" style="--delay:.9s">
+          <article class="card" data-tilt>
+            <span class="card-sheen" aria-hidden="true"></span>
+            <span class="card-tag">ISO 9000</span>
+            <span class="card-ghost">9000</span>
+            <div class="card-body">
+              <h3>O dicionário</h3>
+              <p>Fundamentos e vocabulário da gestão da qualidade. Explica o que cada termo <em>quer dizer</em>.</p>
+            </div>
+          </article>
+        </div>
+        <div class="x" data-anim="scale" style="--delay:1.25s">×</div>
+        <div class="card-wrap" data-anim="card" style="--delay:1.2s">
+          <article class="card accent" data-tilt>
+            <span class="card-sheen" aria-hidden="true"></span>
+            <span class="card-tag">ISO 9001</span>
+            <span class="card-ghost">9001</span>
+            <div class="card-body">
+              <h3>As regras do jogo</h3>
+              <p>Os requisitos do Sistema de Gestão da Qualidade (SGQ). A única da família que <em>certifica</em>.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      <p class="family-note" data-anim style="--delay:2.2s"><span class="mono">+ ISO 9004</span>Orientações para o sucesso sustentado — para quem quer ir além do mínimo exigido.</p>
+    </section>
 
-      listTitle.textContent = `Documentos • ${folderLabel}`;
-      listSubtitle.textContent = qEl.value.trim()
-        ? `Filtrando por: "${qEl.value.trim()}"`
-        : (activeFolder ? "Mostrando somente essa categoria." : "Mostrando tudo.");
+    <!-- 05 · História -->
+    <section class="slide s-history" data-title="História">
+      <p class="eyebrow" data-anim style="--d:0">04 — Um pouco de história</p>
+      <h2 class="title">
+        <span class="line"><span data-split>Do quartel para</span> <span class="serif grad-text" data-split>o mundo.</span></span>
+      </h2>
+      <div class="history">
+        <div class="hx-rail"><span></span></div>
+        <div class="hx hx-pre" style="--i:0"><span class="hx-y">1959</span><span class="hx-dot"></span><b>MIL-Q-9858</b><p>Forças armadas dos EUA cobram qualidade dos fornecedores</p></div>
+        <div class="hx hx-pre" style="--i:1"><span class="hx-y">1979</span><span class="hx-dot"></span><b>BS 5750</b><p>Reino Unido cria a 1ª norma para a indústria em geral</p></div>
+        <div class="hx" style="--i:2"><span class="hx-y">1987</span><span class="hx-dot"></span><b>1ª edição</b><p>A ISO adota a BS 5750. Foco em inspecionar o produto no final</p></div>
+        <div class="hx" style="--i:3"><span class="hx-y">1994</span><span class="hx-dot"></span><b>2ª edição</b><p>Mais ações preventivas</p></div>
+        <div class="hx" style="--i:4"><span class="hx-y">2000</span><span class="hx-dot"></span><b>3ª edição</b><p>Processos, foco no cliente e melhoria contínua</p></div>
+        <div class="hx" style="--i:5"><span class="hx-y">2008</span><span class="hx-dot"></span><b>4ª edição</b><p>Ajustes e esclarecimentos</p></div>
+        <div class="hx" style="--i:6"><span class="hx-y">2015</span><span class="hx-dot"></span><b>5ª edição</b><p>Contexto, riscos e estrutura de 10 seções</p></div>
+        <div class="hx hx-now" style="--i:7"><span class="hx-y">2026</span><span class="hx-dot"></span><b>6ª edição</b><p>A atual, publicada em 16 de setembro</p></div>
+      </div>
+      <p class="hx-legend mono" data-anim style="--delay:3.6s"><i></i>Antecedentes <i class="ed"></i>Edições da ISO 9001</p>
+    </section>
 
-      for (const f of filtered){
-        const row = document.createElement("div");
-        row.className = "row";
+    <!-- 06 · Princípios -->
+    <section class="slide s-principles" data-title="Princípios">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">05 — Os princípios</p>
+          <h2 class="title">
+            <span class="line"><span data-split>Sete</span></span>
+            <span class="line"><span class="serif grad-text" data-split>princípios.</span></span>
+          </h2>
+          <p class="lead" data-anim style="--d:10">A base de toda a família ISO 9000. Não estão em ordem de importância — mas o primeiro é o cliente.</p>
+        </div>
+        <div class="tiles">
+          <div class="tile" data-spot data-anim style="--d:6"><span class="tile-n">1</span><span class="tile-t">Foco no cliente</span></div>
+          <div class="tile" data-spot data-anim style="--d:7"><span class="tile-n">2</span><span class="tile-t">Liderança</span></div>
+          <div class="tile" data-spot data-anim style="--d:8"><span class="tile-n">3</span><span class="tile-t">Engajamento das pessoas</span></div>
+          <div class="tile" data-spot data-anim style="--d:9"><span class="tile-n">4</span><span class="tile-t">Abordagem de processo</span></div>
+          <div class="tile" data-spot data-anim style="--d:10"><span class="tile-n">5</span><span class="tile-t">Melhoria</span></div>
+          <div class="tile" data-spot data-anim style="--d:11"><span class="tile-n">6</span><span class="tile-t">Decisão baseada em evidências</span></div>
+          <div class="tile" data-spot data-anim style="--d:12"><span class="tile-n">7</span><span class="tile-t">Gestão de relacionamento</span></div>
+          <button class="tile tile-flip" type="button" data-anim style="--d:13" aria-pressed="false" aria-label="Virar a carta">
+            <span class="flip-inner">
+              <span class="flip-face face-back" aria-hidden="true">
+                <svg class="emblem" viewBox="0 0 100 100">
+                  <circle class="emblem-disc" cx="50" cy="50" r="30"/>
+                  <circle cx="50" cy="50" r="30"/>
+                  <circle cx="50" cy="50" r="24" class="thin"/>
+                  <path d="M50 30 L54.5 45.5 L70 50 L54.5 54.5 L50 70 L45.5 54.5 L30 50 L45.5 45.5Z"/>
+                </svg>
+              </span>
+              <span class="flip-face face-front">
+                <span class="pip pip-tl">7<i>✦</i></span>
+                <span class="flip-msg">7 princípios.<em>1 sistema.</em></span>
+                <span class="pip pip-br">7<i>✦</i></span>
+              </span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-        const title = document.createElement("div");
-        title.className = "title";
+    <!-- 07 · PDCA -->
+    <section class="slide s-pdca" data-title="Ciclo PDCA">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">06 — Ciclo PDCA</p>
+          <h2 class="title">
+            <span class="line"><span data-split>Gira,</span></span>
+            <span class="line"><span class="serif grad-text" data-split>e nunca para.</span></span>
+          </h2>
+          <ol class="steps">
+            <li data-anim="left" style="--d:8"><b>P</b><span>Planejar<small>Definir objetivos, processos e recursos</small></span></li>
+            <li data-anim="left" style="--d:9"><b>D</b><span>Desenvolver<small>Fazer o que foi planejado</small></span></li>
+            <li data-anim="left" style="--d:10"><b>C</b><span>Conferir<small>Medir e comparar com o planejado</small></span></li>
+            <li data-anim="left" style="--d:11"><b>A</b><span>Agir<small>Corrigir o erro e padronizar o acerto</small></span></li>
+          </ol>
+        </div>
+        <div class="pdca" data-anim="scale" style="--d:4">
+          <svg viewBox="0 0 400 400" class="pdca-svg">
+            <defs>
+              <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="5" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <circle class="pdca-dash" cx="200" cy="200" r="188"/>
+            <circle class="pdca-track" cx="200" cy="200" r="150"/>
+            <g transform="rotate(-90 200 200)">
+              <circle class="arc" cx="200" cy="200" r="150" pathLength="100" style="--i:0;--c:#2563ff;stroke-dashoffset:-1"/>
+              <circle class="arc" cx="200" cy="200" r="150" pathLength="100" style="--i:1;--c:#3ba7ff;stroke-dashoffset:-26"/>
+              <circle class="arc" cx="200" cy="200" r="150" pathLength="100" style="--i:2;--c:#8be9ff;stroke-dashoffset:-51"/>
+              <circle class="arc" cx="200" cy="200" r="150" pathLength="100" style="--i:3;--c:#eef3ff;stroke-dashoffset:-76"/>
+            </g>
+            <g class="orbit"><circle cx="200" cy="50" r="6" fill="#fff" filter="url(#glow)"/></g>
+          </svg>
+          <div class="pdca-label l-p"><b>P</b>Plan</div>
+          <div class="pdca-label l-d"><b>D</b>Do</div>
+          <div class="pdca-label l-c"><b>C</b>Check</div>
+          <div class="pdca-label l-a"><b>A</b>Act</div>
+          <div class="pdca-core"><em>Melhoria</em><span>contínua</span></div>
+        </div>
+      </div>
+    </section>
 
-        const a = document.createElement("a");
-        a.href = "#";
-        a.textContent = prettyTitle(f.name);
-        a.onclick = (e)=>{ e.preventDefault(); openInViewer(f); };
+    <!-- 08 · As 10 seções -->
+    <section class="slide s-sections" data-title="As 10 seções">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">07 — Como a norma é organizada</p>
+          <h2 class="title">
+            <span class="line"><span data-split>10 seções.</span></span>
+            <span class="line"><span class="serif grad-text" data-split>7 que contam.</span></span>
+          </h2>
+          <p class="lead" data-anim style="--d:12">As seções 4 a 10 trazem os requisitos que são auditados — e cada uma se encaixa no PDCA. É a mesma estrutura da ISO 14001 e da ISO 45001.</p>
+          <div class="legend" data-anim style="--d:14">
+            <span class="lg" data-lg="P"><i class="ph ph-p">P</i>Planejar</span>
+            <span class="lg" data-lg="D"><i class="ph ph-d">D</i>Desenvolver</span>
+            <span class="lg" data-lg="C"><i class="ph ph-c">C</i>Conferir</span>
+            <span class="lg" data-lg="A"><i class="ph ph-a">A</i>Agir</span>
+          </div>
+        </div>
+        <div class="sections">
+          <div class="sec sec-intro" data-ph="" data-anim="left" style="--d:6"><span class="sec-n">1</span><span class="sec-t">Escopo</span><span class="sec-ph"><i class="ph ph-intro">Intro</i></span></div>
+          <div class="sec sec-intro" data-ph="" data-anim="left" style="--d:7"><span class="sec-n">2</span><span class="sec-t">Referências normativas</span><span class="sec-ph"><i class="ph ph-intro">Intro</i></span></div>
+          <div class="sec sec-intro" data-ph="" data-anim="left" style="--d:8"><span class="sec-n">3</span><span class="sec-t">Termos e definições</span><span class="sec-ph"><i class="ph ph-intro">Intro</i></span></div>
+          <div class="sec" data-ph="P" data-anim="left" style="--d:9"><span class="sec-n">4</span><span class="sec-t">Contexto da organização</span><span class="sec-ph"><i class="ph ph-p">P</i></span></div>
+          <div class="sec" data-ph="P" data-anim="left" style="--d:10"><span class="sec-n">5</span><span class="sec-t">Liderança</span><span class="sec-ph"><i class="ph ph-p">P</i></span></div>
+          <div class="sec" data-ph="P" data-anim="left" style="--d:11"><span class="sec-n">6</span><span class="sec-t">Planejamento</span><span class="sec-ph"><i class="ph ph-p">P</i></span></div>
+          <div class="sec" data-ph="P D" data-anim="left" style="--d:12"><span class="sec-n">7</span><span class="sec-t">Apoio</span><span class="sec-ph"><i class="ph ph-p">P</i><i class="ph ph-d">D</i></span></div>
+          <div class="sec" data-ph="D" data-anim="left" style="--d:13"><span class="sec-n">8</span><span class="sec-t">Operação</span><span class="sec-ph"><i class="ph ph-d">D</i></span></div>
+          <div class="sec" data-ph="C" data-anim="left" style="--d:14"><span class="sec-n">9</span><span class="sec-t">Avaliação de desempenho</span><span class="sec-ph"><i class="ph ph-c">C</i></span></div>
+          <div class="sec" data-ph="A" data-anim="left" style="--d:15"><span class="sec-n">10</span><span class="sec-t">Melhoria</span><span class="sec-ph"><i class="ph ph-a">A</i></span></div>
+        </div>
+      </div>
+    </section>
 
-        const meta = document.createElement("div");
-        meta.className = "meta";
-        const catRaw = f.name.includes("/") ? f.name.split("/")[0] : "Sem categoria";
-        const catNice = catRaw === "Sem categoria" ? catRaw : displayFolderName(catRaw);
-        meta.textContent = `${catNice} • ${when}`.trim();
+    <!-- 09 · Processos -->
+    <section class="slide s-process" data-title="Processos">
+      <p class="eyebrow" data-anim style="--d:0">08 — Abordagem de processo</p>
+      <h2 class="title">
+        <span class="line"><span data-split>Tudo é</span> <span class="serif grad-text" data-split>processo.</span></span>
+      </h2>
+      <div class="flow">
+        <div class="node" data-anim="scale" style="--d:6"><span class="mono">Entradas</span><b>Requisitos do cliente</b></div>
+        <div class="link" data-anim="grow" style="--d:8"></div>
+        <div class="node node-core" data-anim="scale" style="--d:10"><span class="mono">Processo</span><b>Atividades que agregam valor</b></div>
+        <div class="link" data-anim="grow" style="--d:12"></div>
+        <div class="node" data-anim="scale" style="--d:14"><span class="mono">Saídas</span><b>Cliente satisfeito</b></div>
+      </div>
+      <div class="notes">
+        <p data-anim style="--d:16"><span class="mono">Contexto</span>Entender riscos e oportunidades do negócio.</p>
+        <p data-anim style="--d:17"><span class="mono">Escopo</span>Quais atividades e processos o SGQ cobre.</p>
+        <p data-anim style="--d:18"><span class="mono">Medição</span>Monitorar para melhorar e garantir conformidade.</p>
+      </div>
+    </section>
 
-        title.appendChild(a);
-        title.appendChild(meta);
+    <!-- 10 · Liderança -->
+    <section class="slide s-lead" data-title="Liderança">
+      <div class="bg-word" aria-hidden="true">
+        <div class="bg-word-track"><span>Liderança</span><span>Liderança</span><span>Liderança</span><span>Liderança</span></div>
+      </div>
+      <p class="eyebrow" data-anim style="--d:0">09 — Alta Direção</p>
+      <h2 class="quote">
+        <span class="line"><span data-split>A qualidade</span></span>
+        <span class="line"><span class="serif grad-text" data-split>começa no topo.</span></span>
+      </h2>
+      <div class="pillars">
+        <div data-anim style="--d:14"><span class="mono">01</span><p>Liderar o SGQ e assegurar a sua eficácia</p></div>
+        <div data-anim style="--d:15"><span class="mono">02</span><p>Garantir recursos: pessoas competentes e infraestrutura</p></div>
+        <div data-anim style="--d:16"><span class="mono">03</span><p>Definir a política e os objetivos da qualidade</p></div>
+      </div>
+    </section>
 
-        const chips = document.createElement("div");
-        chips.className = "chips";
+    <!-- 11 · Conceitos-chave -->
+    <section class="slide s-ledger" data-title="Conceitos-chave">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">10 — Conceitos-chave</p>
+          <h2 class="title">
+            <span class="line"><span data-split>Errar é</span> <span class="serif" data-split>humano.</span></span>
+            <span class="line"><span data-split>Repetir é</span></span>
+            <span class="line"><span class="serif grad-text" data-split>escolha.</span></span>
+          </h2>
+        </div>
+        <div class="ledger">
+          <div class="row" data-anim="left" style="--d:8">
+            <button class="row-head" type="button" aria-expanded="false">
+              <span class="row-k">Não conformidade</span><span class="row-v">O não atendimento a um requisito estabelecido.</span><span class="row-i" aria-hidden="true">↗</span>
+            </button>
+            <div class="row-body"><div class="row-detail"><span class="mono">Em resumo</span><p>Acontece quando algo foge do que foi definido — pela norma, pelo cliente ou pela própria empresa. Um lote fora da especificação, um prazo descumprido. Toda não conformidade é registrada, tratada e analisada.</p></div></div>
+          </div>
+          <div class="row" data-anim="left" style="--d:9">
+            <button class="row-head" type="button" aria-expanded="false">
+              <span class="row-k">Evidência objetiva</span><span class="row-v">Provas baseadas em fatos e dados verificáveis.</span><span class="row-i" aria-hidden="true">↗</span>
+            </button>
+            <div class="row-body"><div class="row-detail"><span class="mono">Em resumo</span><p>Na ISO 9001, “eu acho” não vale. Decisões e auditorias se apoiam em registros, medições e documentos que qualquer pessoa pode conferir — um relatório de inspeção, um indicador mensal.</p></div></div>
+          </div>
+          <div class="row" data-anim="left" style="--d:10">
+            <button class="row-head" type="button" aria-expanded="false">
+              <span class="row-k">Ação corretiva</span><span class="row-v">Eliminar a causa, para que o problema não volte.</span><span class="row-i" aria-hidden="true">↗</span>
+            </button>
+            <div class="row-body"><div class="row-detail"><span class="mono">Em resumo</span><p>Pediram bolo de chocolate e veio de morango: refazer o bolo é só a <strong>correção</strong>. Descobrir que faltava um formulário de pedido e criá-lo é a <strong>ação corretiva</strong> — ataca a causa, não o efeito.</p></div></div>
+          </div>
+          <div class="row" data-anim="left" style="--d:11">
+            <button class="row-head" type="button" aria-expanded="false">
+              <span class="row-k">Processos externos</span><span class="row-v">Atividades terceirizadas — e ainda sob controle.</span><span class="row-i" aria-hidden="true">↗</span>
+            </button>
+            <div class="row-body"><div class="row-detail"><span class="mono">Em resumo</span><p>Terceirizar não tira a responsabilidade. Se a entrega é feita por outra empresa, a organização continua tendo que controlar e monitorar esse serviço.</p></div></div>
+          </div>
+          <div class="row" data-anim="left" style="--d:12">
+            <button class="row-head" type="button" aria-expanded="false">
+              <span class="row-k">Auditoria interna</span><span class="row-v">Avaliar a eficácia do SGQ e achar melhorias.</span><span class="row-i" aria-hidden="true">↗</span>
+            </button>
+            <div class="row-body"><div class="row-detail"><span class="mono">Em resumo</span><p>Uma checagem planejada, feita pela própria organização, para ver se o sistema funciona como deveria. Ela revela falhas e oportunidades de melhoria antes da auditoria externa.</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        const chipOpen = document.createElement("span");
-        chipOpen.className = "chip";
-        chipOpen.textContent = "Abrir";
+    <!-- 12 · Certificação -->
+    <section class="slide s-timeline" data-title="Certificação">
+      <p class="eyebrow" data-anim style="--d:0">11 — Auditorias e certificação</p>
+      <h2 class="title">
+        <span class="line"><span data-split>O caminho até o</span> <span class="serif grad-text" data-split>selo.</span></span>
+      </h2>
+      <div class="timeline" id="timeline">
+        <div class="tl-step"><button class="tl-dot" type="button" aria-label="Avançar: Diagnóstico"></button><div class="tl-body"><span class="mono">01</span><b>Diagnóstico</b><p>Entender o contexto e mapear processos.</p></div></div>
+        <div class="tl-step"><button class="tl-dot" type="button" aria-label="Avançar: Implementação"></button><div class="tl-body"><span class="mono">02</span><b>Implementação</b><p>Estruturar o Sistema de Gestão da Qualidade.</p></div></div>
+        <div class="tl-step"><button class="tl-dot" type="button" aria-label="Avançar: Auditoria interna"></button><div class="tl-body"><span class="mono">03</span><b>Auditoria interna</b><p>1ª parte: a própria empresa se avalia. É o “simulado”.</p></div></div>
+        <div class="tl-step"><button class="tl-dot" type="button" aria-label="Avançar: Análise crítica"></button><div class="tl-body"><span class="mono">04</span><b>Análise crítica</b><p>A direção revisa os resultados.</p></div></div>
+        <div class="tl-step tl-final">
+          <button class="tl-dot" type="button" aria-label="Conceder o selo">
+            <span class="tl-burst"></span><span class="tl-burst b2"></span><span class="tl-burst b3"></span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12.5l4.2 4.2L18.5 7.8" pathLength="1"/></svg>
+          </button>
+          <div class="tl-body"><span class="mono">05</span><b>Auditoria externa</b><p>3ª parte: um organismo certificador acreditado concede o selo.</p></div>
+        </div>
+      </div>
+      <div class="tl-after">
+        <p><span class="mono">Validade</span>3 anos</p>
+        <p><span class="mono">Manutenção</span>Auditorias de acompanhamento, normalmente 1 vez por ano</p>
+        <p><span class="mono">No Brasil</span>Certificadores acreditados pelo Inmetro (Cgcre)</p>
+      </div>
+      <p class="tl-hint mono" aria-hidden="true">Clique na esfera para avançar</p>
+    </section>
 
-        const chipDl = document.createElement("a");
-        chipDl.className = "chip";
-        chipDl.href = f.publicUrl;
-        chipDl.target = "_blank";
-        chipDl.rel = "noopener";
-        chipDl.textContent = "Baixar";
+    <!-- 13 · Benefícios -->
+    <section class="slide s-benefits" data-title="Benefícios">
+      <p class="eyebrow" data-anim style="--d:0">12 — Benefícios</p>
+      <h2 class="title">
+        <span class="line"><span data-split>Fazer certo de primeira</span></span>
+        <span class="line"><span class="serif grad-text" data-split>sai mais barato.</span></span>
+      </h2>
+      <div class="benefits">
+        <div class="bn" data-anim style="--d:10"><span class="bn-n">01</span><b>Clientes mais fiéis</b><p>Satisfeitos, eles voltam — e indicam.</p></div>
+        <div class="bn" data-anim style="--d:12"><span class="bn-n">02</span><b>Menos custo</b><p>Menos retrabalho, desperdício e reclamação.</p></div>
+        <div class="bn" data-anim style="--d:14"><span class="bn-n">03</span><b>Credibilidade</b><p>Grandes empresas e licitações exigem fornecedor certificado.</p></div>
+        <div class="bn" data-anim style="--d:16"><span class="bn-n">04</span><b>Portas abertas</b><p>Padrão reconhecido no mundo todo: ajuda a exportar.</p></div>
+        <div class="bn" data-anim style="--d:18"><span class="bn-n">05</span><b>Cultura de melhoria</b><p>Decisões com dados e equipe engajada.</p></div>
+      </div>
+    </section>
 
-        chips.appendChild(chipOpen);
-        chips.appendChild(chipDl);
+    <!-- 14 · Números -->
+    <section class="slide s-numbers" data-title="Em números">
+      <p class="eyebrow" data-anim style="--d:0">13 — Em números</p>
+      <h2 class="title">
+        <span class="line"><span data-split>A norma de gestão</span></span>
+        <span class="line"><span class="serif grad-text" data-split>mais usada do mundo.</span></span>
+      </h2>
+      <div class="stats">
+        <div class="stat" data-anim style="--d:10"><div class="stat-n"><span data-count="1.47" data-decimals="2">1,47</span><em>mi</em></div><p>Certificados ISO 9001 válidos no mundo</p></div>
+        <div class="stat" data-anim style="--d:12"><div class="stat-n"><span data-count="2.32" data-decimals="2">2,32</span><em>mi</em></div><p>Locais certificados no mundo</p></div>
+        <div class="stat" data-anim style="--d:14"><div class="stat-n"><span data-count="18536">18.536</span></div><p>Certificados no Brasil</p></div>
+        <div class="stat" data-anim style="--d:16"><div class="stat-n"><span data-count="10">10</span><em>º</em></div><p>Lugar do Brasil no mundo — e 2º nas Américas</p></div>
+      </div>
+      <p class="source mono" data-anim style="--d:18">Fonte: ISO Survey 2024, pesquisa anual da própria ISO</p>
+    </section>
 
-        if (currentUser) {
-          const chipDownload = document.createElement("a");
-          chipDownload.className = "chip";
-          chipDownload.href = f.publicUrl;
-          chipDownload.target = "_blank";
-          chipDownload.rel = "noopener";
-          chipDownload.textContent = "Baixar";
-          chips.appendChild(chipDownload);
-        }
+    <!-- 15 · ISO 9001:2026 -->
+    <section class="slide s-new" data-title="ISO 9001:2026">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">14 — Novidade</p>
+          <h2 class="title">
+            <span class="line"><span data-split>Saiu agora:</span></span>
+            <span class="line"><span class="serif grad-text" data-split>ISO 9001:2026.</span></span>
+          </h2>
+          <div class="new-meta" data-anim style="--d:12">
+            <div><span class="mono">Publicada em</span><b>16.09.2026</b></div>
+            <div><span class="mono">Edição</span><b>6ª</b></div>
+          </div>
+          <p class="lead" data-anim style="--d:14">Não é uma norma nova do zero: mantém as 10 seções, a abordagem por processos e o PDCA. São ajustes.</p>
+        </div>
+        <div>
+          <div class="changes">
+          <div class="chg" data-anim="left" style="--d:8"><b>Cultura e ética</b><p>A cultura da qualidade e o comportamento ético agora aparecem explícitos na liderança e na conscientização.</p></div>
+          <div class="chg" data-anim="left" style="--d:9"><b>Riscos ≠ oportunidades</b><p>Ameaças e chances de ganho passam a ter requisitos separados.</p></div>
+          <div class="chg" data-anim="left" style="--d:10"><b>Gestão de mudanças</b><p>Mais exigência para planejar, comunicar e revisar mudanças no sistema.</p></div>
+          <div class="chg" data-anim="left" style="--d:11"><b>Clima</b><p>Mudanças climáticas entram no contexto da organização — vindas da emenda de 2024.</p></div>
+          </div>
+          <div class="transition" data-anim style="--d:13">
+            <div class="tr-head"><span class="mono">Transição para quem tem a versão 2015</span><span class="mono">até 30.09.2029</span></div>
+            <div class="tr-bar"><span class="tr-fill"></span><span class="tr-now" id="trNow"><i>hoje</i></span></div>
+            <div class="tr-scale"><span>set/2026</span><span>2027</span><span>2028</span><span>set/2029</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <!-- 16 · Na prática -->
+    <section class="slide s-ticket" data-title="Na prática">
+      <div class="split-layout">
+        <div>
+          <p class="eyebrow" data-anim style="--d:0">15 — Na prática</p>
+          <h2 class="title">
+            <span class="line"><span data-split>Tudo junto,</span></span>
+            <span class="line"><span class="serif grad-text" data-split>numa lanchonete.</span></span>
+          </h2>
+          <p class="lead" data-anim style="--d:12">Os clientes reclamavam da demora. Veja o PDCA resolvendo o problema — e começando de novo.</p>
+          <p class="tk-hint mono" aria-hidden="true">Clique na comanda para imprimir o próximo passo</p>
+        </div>
+        <div class="ticket-wrap" data-anim style="--d:8">
+          <span class="tk-slot" aria-hidden="true"></span>
+          <button class="ticket" type="button" id="ticket" aria-label="Imprimir o próximo passo">
+            <span class="tk-head"><b>LANCHONETE DA ESQUINA</b><span>PEDIDO Nº 9001 · MESA 07</span></span>
+            <span class="tk-line"><span class="tk-row"><i class="tk-k">★</i><span class="tk-txt"><b>Foco no cliente</b><em>A maior reclamação: demora na entrega.</em></span></span></span>
+            <span class="tk-line"><span class="tk-row"><i class="tk-k">P</i><span class="tk-txt"><b>Planejar</b><em>Meta: entregar em até 30 minutos. Preparo padronizado.</em></span></span></span>
+            <span class="tk-line"><span class="tk-row"><i class="tk-k">D</i><span class="tk-txt"><b>Desenvolver</b><em>Equipe treinada. Horário de cada pedido anotado.</em></span></span></span>
+            <span class="tk-line"><span class="tk-row"><i class="tk-k">C</i><span class="tk-txt"><b>Conferir</b><em>Tempos medidos — evidência objetiva: o gargalo é o horário de pico.</em></span></span></span>
+            <span class="tk-line"><span class="tk-row"><i class="tk-k">A</i><span class="tk-txt"><b>Agir</b><em>Ação corretiva: reforço da equipe no pico.</em></span></span></span>
+            <span class="tk-line tk-total-line"><span class="tk-row tk-total"><b>TOTAL: cliente satisfeito ✓</b><em>↺ e o ciclo recomeça</em></span></span>
+          </button>
+        </div>
+      </div>
+    </section>
 
-        row.appendChild(title);
-        row.appendChild(chips);
-        listEl.appendChild(row);
-      }
+    <!-- 17 · Encerramento -->
+    <section class="slide s-end" data-title="Encerramento">
+      <svg class="end-ring" viewBox="0 0 600 600" aria-hidden="true">
+        <defs>
+          <linearGradient id="endGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2563ff"/><stop offset=".5" stop-color="#3ba7ff"/><stop offset="1" stop-color="#8be9ff"/>
+          </linearGradient>
+        </defs>
+        <circle cx="300" cy="300" r="280" pathLength="100"/>
+      </svg>
+      <p class="eyebrow center" data-anim style="--d:0">Fim — ou recomeço</p>
+      <h2 class="end-title"><span class="line"><span class="serif grad-text" data-split>Obrigado.</span></span></h2>
+      <p class="end-sub" data-anim style="--d:10">Qualidade não é um destino — <em>é um ciclo.</em></p>
+      <div class="end-meta" data-anim style="--d:12">
+        <span class="mono">Perguntas?</span>
+        <button class="restart" id="restart" type="button">↺ Recomeçar</button>
+      </div>
+    </section>
 
-      totalCountEl.textContent = allFiles.length;
-    }
+  </main>
 
-    async function refreshAll(){
-      setStatus("Carregando…");
-      listEl.innerHTML = "";
-      emptyEl.style.display = "none";
+  <footer class="hud hud-bottom">
+    <div class="counter"><span class="counter-win"><span id="cur">01</span></span><span class="counter-line"></span><span id="total">11</span></div>
+    <nav class="dots" id="dots" aria-label="Slides"></nav>
+    <div class="arrows">
+      <button type="button" id="prev" aria-label="Anterior">←</button>
+      <button type="button" id="next" aria-label="Próximo">→</button>
+    </div>
+  </footer>
+  <div class="progress"><span id="progressBar"></span></div>
+  <div class="wipe" id="wipe" aria-hidden="true"></div>
 
-      try{
-        const files = await listRecursive("");
-        files.sort((a,b)=> (new Date(b.updated_at||0)) - (new Date(a.updated_at||0)));
-        allFiles = files;
+  <div class="cursor" aria-hidden="true"><span class="cursor-ring" id="ring"></span><span class="cursor-dot" id="cdot"></span></div>
 
-        buildCategories(allFiles);
-        highlightCats();
-        render();
-
-        setStatus("");
-      } catch (e){
-        setStatus("Erro ao carregar: " + (e?.message || e));
-      }
-    }
-
-    // eventos
-    uploadBtn.addEventListener("click", uploadDocx);
-    refreshBtn.addEventListener("click", refreshAll);
-
-    adminBtn.addEventListener("click", async () => {
-      if (currentUser) await logoutAdmin();
-      else await loginAdmin();
-    });
-
-    allBtn.addEventListener("click", ()=>{
-      activeFolder = "";
-      qEl.value = "";
-      highlightCats();
-      render();
-    });
-
-    qEl.addEventListener("input", ()=> render());
-
-
-    // ===== Mobile drawer =====
-    const menuBtn = document.getElementById("menuBtn");
-    const backdrop = document.getElementById("backdrop");
-    function openSidebar(){ document.body.classList.add("sidebar-open"); }
-    function closeSidebar(){ document.body.classList.remove("sidebar-open"); }
-
-    if (menuBtn) menuBtn.addEventListener("click", () => {
-      document.body.classList.toggle("sidebar-open");
-    });
-    if (backdrop) backdrop.addEventListener("click", closeSidebar);
-
-    // Fecha o menu ao escolher categoria/atalho no mobile
-    if (catsEl) catsEl.addEventListener("click", () => {
-      if (window.innerWidth <= 980) closeSidebar();
-    });
-    if (allBtn) allBtn.addEventListener("click", () => {
-      if (window.innerWidth <= 980) closeSidebar();
-    });
-
-
-    // init
-    (async () => {
-      await checkUser();
-      await refreshAll();
-    })();
-  </script>
+  <script src="script.js?v=16"></script>
 </body>
 </html>
